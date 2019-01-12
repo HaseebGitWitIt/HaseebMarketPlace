@@ -64,6 +64,32 @@ module Api
             end
          end
 
+         def purchase
+            product = Product.find(params[:id])
+            if product.quantity > 0
+               product.decrement(:quantity)
+               if product.save
+                  render json: {
+                     status: 'SUCCESS',
+                     message: 'Bought specific product',
+                     data: product
+                  }, status: :ok
+               else
+                  render json: {
+                     status: 'ERROR',
+                     message: 'Could not purchase specific product',
+                     data: product.errors
+                  }, status: :unprocessable_entity
+               end
+            else
+               render json: {
+                  status: 'ERROR',
+                  message: 'Out of stock',
+                  data: product
+               }, status: :ok
+            end
+         end
+
          private
 
          def product_params
